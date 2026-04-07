@@ -725,5 +725,48 @@
       </div>
     </section>
   </div>
+
+  <div class="security-notice-backdrop is-hidden" id="security-notice-backdrop" aria-hidden="true">
+    <section class="security-notice-modal" id="security-notice-modal" role="dialog" aria-modal="true" aria-labelledby="security-notice-title">
+      <div class="security-notice-head">
+        <h2 id="security-notice-title">🔒 Keamanan & Privasi Data</h2>
+        <button class="security-notice-close" id="security-notice-close" type="button" aria-label="Tutup pemberitahuan keamanan">✕</button>
+      </div>
+
+      <div class="security-notice-body">
+        <div class="security-notice-section">
+          <h3>✅ Data Aman di Perangkat Anda</h3>
+          <p>Semua informasi keuangan disimpan <strong>hanya di browser lokal</strong> perangkat Anda. Data tidak pernah dikirim ke server atau pihak ketiga manapun.</p>
+        </div>
+
+        <div class="security-notice-section">
+          <h3>🔐 Fitur Keamanan</h3>
+          <ul class="security-notice-list">
+            <li>Tidak ada koneksi internet — aplikasi offline</li>
+            <li>Protection headers lengkap (CSP, X-Frame-Options, dll)</li>
+            <li>Mode privat tersedia (hapus otomatis saat browser ditutup)</li>
+            <li>Tidak ada script eksternal atau tracking</li>
+          </ul>
+        </div>
+
+        <div class="security-notice-section">
+          <h3>⚠️ Penting untuk Diperhatikan</h3>
+          <ul class="security-notice-list">
+            <li><strong>Jaga keamanan perangkat</strong> — update browser dan hindari malware</li>
+            <li><strong>Shared device?</strong> — gunakan Mode Privat agar data hilang saat browser ditutup</li>
+            <li><strong>Tanpa enkripsi</strong> — data disimpan sebagai plaintext di localStorage</li>
+          </ul>
+        </div>
+
+        <div class="security-notice-section">
+          <p class="security-notice-note">💡 <strong>Saran:</strong> Hanya gunakan untuk tracking dan perencanaan. JANGAN simpan password atau token sensitif di sini.</p>
+        </div>
+      </div>
+
+      <div class="security-notice-actions">
+        <button class="button button-primary" id="security-notice-understood" type="button">Saya paham</button>
+      </div>
+    </section>
+  </div>
 </body>
 </html>

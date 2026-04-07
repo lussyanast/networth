@@ -333,6 +333,9 @@ const historyHighlightValue = document.getElementById("history-highlight-value")
 const historyHighlightCopy = document.getElementById("history-highlight-copy");
 const historyList = document.getElementById("history-list");
 const historyNote = document.getElementById("history-note");
+const securityNoticeBackdrop = document.getElementById("security-notice-backdrop");
+const securityNoticeCloseButton = document.getElementById("security-notice-close");
+const securityNoticeUnderstoodButton = document.getElementById("security-notice-understood");
 const uiState = {
   filter: "all",
   preset: "all",
@@ -350,6 +353,7 @@ renderPlanningInputs();
 renderProfileTemplateState();
 renderCategories();
 attachGlobalEvents();
+initializeSecurityNotice();
 updateUI();
 window.addEventListener?.("keydown", handleGlobalKeydown);
 
@@ -1256,6 +1260,13 @@ function attachGlobalEvents() {
   });
   profileTemplateButtons.forEach((button) => {
     button.addEventListener("click", () => applyProfileTemplate(button.dataset.profileTemplate));
+  });
+  securityNoticeCloseButton?.addEventListener("click", closeSecurityNotice);
+  securityNoticeUnderstoodButton?.addEventListener("click", closeSecurityNotice);
+  securityNoticeBackdrop?.addEventListener("click", (event) => {
+    if (event.target === securityNoticeBackdrop) {
+      closeSecurityNotice();
+    }
   });
 }
 
@@ -2346,6 +2357,24 @@ function formatImportPreviewDate(date) {
     dateStyle: "long",
     timeStyle: "short"
   }).format(date);
+}
+
+function initializeSecurityNotice() {
+  const securityNoticeSeen = sessionStorage.getItem("security-notice-seen");
+  if (!securityNoticeSeen) {
+    openSecurityNotice();
+  }
+}
+
+function openSecurityNotice() {
+  securityNoticeBackdrop?.classList.remove("is-hidden");
+  securityNoticeBackdrop?.setAttribute("aria-hidden", "false");
+}
+
+function closeSecurityNotice() {
+  sessionStorage.setItem("security-notice-seen", "true");
+  securityNoticeBackdrop?.classList.add("is-hidden");
+  securityNoticeBackdrop?.setAttribute("aria-hidden", "true");
 }
 
 function wipeStoredData() {
