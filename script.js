@@ -336,6 +336,12 @@ const historyNote = document.getElementById("history-note");
 const securityNoticeBackdrop = document.getElementById("security-notice-backdrop");
 const securityNoticeCloseButton = document.getElementById("security-notice-close");
 const securityNoticeUnderstoodButton = document.getElementById("security-notice-understood");
+const themeToggleButton = document.getElementById("theme-toggle");
+const mobileMenuToggle = document.getElementById("mobile-menu-toggle");
+const mobileNavDrawer = document.getElementById("mobile-nav-drawer");
+const mobileNavOverlay = document.getElementById("mobile-nav-overlay");
+const mobileNavClose = document.getElementById("mobile-nav-close");
+const mobileNavLinks = Array.from(document.querySelectorAll(".mobile-nav-link"));
 const uiState = {
   filter: "all",
   preset: "all",
@@ -347,6 +353,7 @@ let pendingImport = null;
 uiState.preset = getProfileTemplate(state.meta?.profileTemplate).viewPreset;
 
 applyMaskMode(getInitialMaskMode());
+initializeTheme();
 privateSessionInput.checked = storageMode === "session";
 updateStorageModeNotice();
 renderPlanningInputs();
@@ -1267,6 +1274,24 @@ function attachGlobalEvents() {
     if (event.target === securityNoticeBackdrop) {
       closeSecurityNotice();
     }
+  });
+  themeToggleButton?.addEventListener("click", toggleTheme);
+  mobileMenuToggle?.addEventListener("click", openMobileNav);
+  mobileNavClose?.addEventListener("click", closeMobileNav);
+  mobileNavOverlay?.addEventListener("click", closeMobileNav);
+  mobileNavLinks.forEach((link) => {
+    link.addEventListener("click", () => {
+      closeMobileNav();
+      const section = link.dataset.section;
+      if (section) {
+        const element = document.getElementById(section);
+        if (element) {
+          setTimeout(() => {
+            element.scrollIntoView({ behavior: "smooth" });
+          }, 100);
+        }
+      }
+    });
   });
 }
 
@@ -3469,3 +3494,43 @@ function escapeXml(value) {
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&apos;");
 }
+
+// Theme management
+function initializeTheme() {
+  const savedTheme = localStorage.getItem("app-theme");
+  const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const theme = savedTheme || (systemPrefersDark ? "dark" : "light");
+  setTheme(theme);
+}
+
+function setTheme(theme) {
+  if (theme === "dark") {
+    document.documentElement.setAttribute("data-theme", "dark");
+    localStorage.setItem("app-theme", "dark");
+  } else {
+    document.documentElement.removeAttribute("data-theme");
+    localStorage.setItem("app-theme", "light");
+  }
+}
+
+function toggleTheme() {
+  const currentTheme = document.documentElement.getAttribute("data-theme");
+  const newTheme = currentTheme === "dark" ? "light" : "dark";
+  setTheme(newTheme);
+}
+
+// Mobile navigation
+function openMobileNav() {
+  mobileNavDrawer?.setAttribute("aria-hidden", "false");
+  mobileNavOverlay?.setAttribute("aria-hidden", "false");
+  mobileMenuToggle?.setAttribute("aria-expanded", "true");
+  document.body.style.overflow = "hidden";
+}
+
+function closeMobileNav() {
+  mobileNavDrawer?.setAttribute("aria-hidden", "true");
+  mobileNavOverlay?.setAttribute("aria-hidden", "true");
+  mobileMenuToggle?.setAttribute("aria-expanded", "false");
+  document.body.style.overflow = "";
+}
+

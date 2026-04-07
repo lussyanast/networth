@@ -16,6 +16,58 @@
   <div class="ambient ambient-one"></div>
   <div class="ambient ambient-two"></div>
 
+  <!-- Top bar with controls -->
+  <div class="app-topbar">
+    <div class="topbar-start">
+      <button class="mobile-menu-toggle" id="mobile-menu-toggle" type="button" aria-label="Buka menu navigasi" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div class="topbar-end">
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Ganti mode gelap/terang">
+        <svg class="theme-icon-light" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg class="theme-icon-dark" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile navigation drawer -->
+  <nav class="mobile-nav-drawer" id="mobile-nav-drawer" aria-hidden="true">
+    <div class="mobile-nav-header">
+      <h2>Navigasi</h2>
+      <button class="mobile-nav-close" id="mobile-nav-close" type="button" aria-label="Tutup menu">✕</button>
+    </div>
+    <ul class="mobile-nav-list">
+      <li><a href="#hero" class="mobile-nav-link" data-section="hero">🏠 Net Worth Tracker</a></li>
+      <li><a href="#workspace" class="mobile-nav-link" data-section="workspace">📝 Input Keuangan</a></li>
+      <li><a href="#profile-panel" class="mobile-nav-link" data-section="profile-panel">👤 Profil & Fokus</a></li>
+      <li><a href="#planning-panel" class="mobile-nav-link" data-section="planning-panel">📊 Perencanaan</a></li>
+      <li><a href="#breakdown-list" class="mobile-nav-link" data-section="breakdown-list">📈 Komposisi Aset</a></li>
+      <li><a href="#balance-composition" class="mobile-nav-link" data-section="balance-composition">⚖️ Posisi Aset vs Utang</a></li>
+      <li><a href="#debt-priority" class="mobile-nav-link" data-section="debt-priority">⚠️ Prioritas Utang</a></li>
+      <li><a href="#goal-net-worth" class="mobile-nav-link" data-section="goal-net-worth">🎯 Target & Proyeksi</a></li>
+      <li><a href="#history-section" class="mobile-nav-link" data-section="history-section">📅 Riwayat</a></li>
+      <li><a href="#data-tools" class="mobile-nav-link" data-section="data-tools">⚙️ Tools & Data</a></li>
+    </ul>
+  </nav>
+
+  <!-- Overlay for mobile nav -->
+  <div class="mobile-nav-overlay" id="mobile-nav-overlay" aria-hidden="true"></div>
+
   <div class="page-shell">
     <header class="hero">
       <div class="hero-copy">
