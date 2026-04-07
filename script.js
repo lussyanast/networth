@@ -243,7 +243,7 @@ const profileTemplates = [
 const storageKey = "networth-tracker-v1";
 const storageModeKey = "networth-tracker-storage-mode";
 const maskModeKey = "networth-tracker-mask-mode";
-const defaultOpenCategoryIds = ["cash", "investment", "debt"];
+const defaultOpenCategoryIds = [];
 const debtPriorityRules = {
   online_loan: { score: 100, badge: "Segera", tone: "critical", reason: "Biaya dan tekanannya biasanya paling agresif." },
   credit_card: { score: 98, badge: "Segera", tone: "critical", reason: "Bunga revolving umumnya tinggi dan cepat menumpuk." },
@@ -341,10 +341,14 @@ const mobileNavDrawer = document.getElementById("mobile-nav-drawer");
 const mobileNavOverlay = document.getElementById("mobile-nav-overlay");
 const mobileNavClose = document.getElementById("mobile-nav-close");
 const mobileNavLinks = Array.from(document.querySelectorAll(".mobile-nav-link"));
+const workspace = document.getElementById("workspace");
+const workspaceSectionButtons = Array.from(document.querySelectorAll("[data-workspace-section]"));
+const workspaceGroups = Array.from(document.querySelectorAll("[data-workspace-group]"));
 const uiState = {
   filter: "all",
   preset: "all",
-  search: ""
+  search: "",
+  activeSection: "input"
 };
 const openCategories = new Set(defaultOpenCategoryIds);
 let pendingImport = null;
@@ -357,10 +361,16 @@ updateStorageModeNotice();
 renderPlanningInputs();
 renderProfileTemplateState();
 renderCategories();
+applyWorkspaceSection(uiState.activeSection, { shouldRender: false });
 attachGlobalEvents();
 initializeSecurityNotice();
 updateUI();
 window.addEventListener?.("keydown", handleGlobalKeydown);
+
+const initialHashTarget = window.location.hash ? window.location.hash.slice(1) : "";
+if (initialHashTarget) {
+  revealWorkspaceTarget(initialHashTarget);
+}
 
 function getInitialStorageMode() {
   try {
@@ -1052,18 +1062,43 @@ function renderCategories() {
     ? visibleCategories
     .map((category) => {
       const totalRows = category.items.length + getCustomRows(category.id).length;
+      const isOpen = uiState.search ? true : openCategories.has(category.id);
       const cardClass = [
         "category-card",
         category.type === "liability" ? "debt-category" : "asset-category",
-        openCategories.has(category.id) || uiState.search ? "is-open" : "is-collapsed"
+        isOpen ? "is-open" : "is-collapsed"
       ].filter(Boolean).join(" ");
-      const defaultRows = category.items
-        .map((item) => renderRow(category.id, item, false))
-        .join("");
-      const customRows = getCustomRows(category.id)
-        .map((item) => renderRow(category.id, item, true))
-        .join("");
-      const isOpen = uiState.search ? true : openCategories.has(category.id);
+      const defaultRows = isOpen
+        ? category.items.map((item) => renderRow(category.id, item, false)).join("")
+        : "";
+      const customRows = isOpen
+        ? getCustomRows(category.id).map((item) => renderRow(category.id, item, true)).join("")
+        : "";
+      const categoryBody = isOpen
+        ? `
+          <div class="category-body">
+            <div class="entries-panel">
+              <div class="entry-head">
+                <span>Item</span>
+                <span>Nominal</span>
+                <span>Catatan</span>
+                <span class="entry-head-action">Aksi</span>
+              </div>
+              <div class="entries">
+                ${defaultRows}
+                ${customRows}
+              </div>
+            </div>
+
+            <div class="category-actions">
+              <p>${category.type === "liability" ? "Isi sisa kewajiban aktif. Format Rupiah akan rapi otomatis." : "Isi nilai saat ini. Cukup ketik angka tanpa perlu titik atau Rp."}</p>
+              <button class="mini-button" type="button" data-action="add-row" data-category="${category.id}">
+                + Tambah baris
+              </button>
+            </div>
+          </div>
+        `
+        : "";
 
       return `
         <section
@@ -1098,28 +1133,7 @@ function renderCategories() {
               </button>
             </div>
           </div>
-
-          <div class="category-body">
-            <div class="entries-panel">
-              <div class="entry-head">
-                <span>Item</span>
-                <span>Nominal</span>
-                <span>Catatan</span>
-                <span class="entry-head-action">Aksi</span>
-              </div>
-              <div class="entries">
-                ${defaultRows}
-                ${customRows}
-              </div>
-            </div>
-
-            <div class="category-actions">
-              <p>${category.type === "liability" ? "Isi sisa kewajiban aktif. Format Rupiah akan rapi otomatis." : "Isi nilai saat ini. Cukup ketik angka tanpa perlu titik atau Rp."}</p>
-              <button class="mini-button" type="button" data-action="add-row" data-category="${category.id}">
-                + Tambah baris
-              </button>
-            </div>
-          </div>
+          ${categoryBody}
         </section>
       `;
     })
@@ -1276,20 +1290,85 @@ function attachGlobalEvents() {
   mobileMenuToggle?.addEventListener("click", openMobileNav);
   mobileNavClose?.addEventListener("click", closeMobileNav);
   mobileNavOverlay?.addEventListener("click", closeMobileNav);
+  workspaceSectionButtons.forEach((button) => {
+    button.addEventListener("click", () => applyWorkspaceSection(button.dataset.workspaceSection));
+  });
   mobileNavLinks.forEach((link) => {
-    link.addEventListener("click", () => {
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
       closeMobileNav();
       const section = link.dataset.section;
       if (section) {
-        const element = document.getElementById(section);
-        if (element) {
-          setTimeout(() => {
-            element.scrollIntoView({ behavior: "smooth" });
-          }, 100);
-        }
+        revealWorkspaceTarget(section);
       }
     });
   });
+}
+
+function applyWorkspaceSection(sectionId, options = {}) {
+  const nextSection = sectionId || "input";
+  uiState.activeSection = nextSection;
+
+  if (workspace) {
+    workspace.dataset.activeSection = nextSection;
+  }
+
+  workspaceSectionButtons.forEach((button) => {
+    const isActive = button.dataset.workspaceSection === nextSection;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+
+  workspaceGroups.forEach((element) => {
+    const groups = String(element.dataset.workspaceGroup || "")
+      .split(/\s+/)
+      .filter(Boolean);
+    const isVisible = groups.includes(nextSection);
+    element.hidden = !isVisible;
+  });
+
+  if (options.shouldRender !== false) {
+    updateUI();
+  }
+}
+
+function revealWorkspaceTarget(targetId) {
+  const element = document.getElementById(targetId);
+  if (!element) {
+    return;
+  }
+
+  if (targetId === "hero") {
+    window.setTimeout(() => {
+      element.scrollIntoView?.({
+        behavior: "smooth",
+        block: "start"
+      });
+    }, 120);
+    return;
+  }
+
+  const hostGroup = element.closest("[data-workspace-group]");
+  const nextSection = hostGroup
+    ? String(hostGroup.dataset.workspaceGroup || "").split(/\s+/).find(Boolean)
+    : targetId === "workspace" || targetId === "profile-panel" || targetId === "planning-panel"
+      ? "input"
+      : targetId === "history-section"
+        ? "history"
+        : targetId === "goal-net-worth"
+          ? "planning"
+          : targetId === "data-tools"
+            ? "tools"
+            : "overview";
+
+  applyWorkspaceSection(nextSection);
+
+  window.setTimeout(() => {
+    element.scrollIntoView?.({
+      behavior: "smooth",
+      block: "start"
+    });
+  }, 120);
 }
 
 function handleSearchInput(event) {
@@ -1366,11 +1445,6 @@ function applyViewPreset(presetId) {
 
   if (!uiState.search) {
     openCategories.clear();
-    if (uiState.preset === "all") {
-      defaultOpenCategoryIds.forEach((categoryId) => openCategories.add(categoryId));
-    } else {
-      getViewPreset(uiState.preset).categoryIds.forEach((categoryId) => openCategories.add(categoryId));
-    }
   }
 
   renderCategories();
@@ -2610,51 +2684,72 @@ function updateUI() {
   document.getElementById("hero-assets").textContent = formatCurrency(totalAssets);
   document.getElementById("hero-liabilities").textContent = formatCurrency(totalLiabilities);
   document.getElementById("hero-net-worth").textContent = formatCurrency(netWorth);
-  document.getElementById("summary-assets").textContent = formatCurrency(totalAssets);
-  document.getElementById("summary-liabilities").textContent = formatCurrency(totalLiabilities);
-  document.getElementById("summary-net-worth").textContent = formatCurrency(netWorth);
-  document.getElementById("summary-liquid-assets").textContent = formatCurrency(liquidAssets);
-  document.getElementById("summary-productive-assets").textContent = formatCurrency(productiveAssets);
-  document.getElementById("summary-consumer-debt").textContent = formatCurrency(consumerDebt);
   document.getElementById("hero-debt-ratio").textContent = formatDebtRatio(debtRatio);
   document.getElementById("hero-top-category").textContent = topCategory ? topCategory.title : "Belum ada";
 
   const status = getStatus(totalAssets, totalLiabilities, netWorth, debtRatio);
+
+  updateStorageModeNotice();
+  document.getElementById("hero-status").textContent = status.hero;
+  updateSummarySection({
+    totalAssets,
+    totalLiabilities,
+    netWorth,
+    liquidAssets,
+    productiveAssets,
+    consumerDebt,
+    status
+  });
+
+  if (uiState.activeSection === "planning") {
+    updateGoalCards(goals);
+    updateProjectionCard(goals);
+  }
+
+  if (uiState.activeSection === "history") {
+    updateHistoryCard({
+      snapshotDate: state.meta.snapshotDate,
+      netWorth,
+      totalAssets,
+      totalLiabilities,
+      liquidAssets,
+      debtRatio
+    });
+  }
+
+  if (uiState.activeSection === "overview") {
+    renderBreakdown(totals, totalAssets, totalLiabilities);
+    renderBalanceComposition(totalAssets, totalLiabilities, liquidAssets);
+    renderDebtPriority();
+  }
+}
+
+function updateSummarySection(metrics) {
   const summaryBadge = document.getElementById("summary-badge");
   const healthCard = document.getElementById("health-card");
   const healthFill = document.getElementById("health-fill");
 
-  updateStorageModeNotice();
-  document.getElementById("hero-status").textContent = status.hero;
-  document.getElementById("summary-caption").textContent = status.summary;
-  document.getElementById("health-score").textContent = `${status.score}/100`;
-  document.getElementById("health-label").textContent = status.label;
-  document.getElementById("health-copy").textContent = status.copy;
-  healthFill.style.width = `${status.score}%`;
-  healthFill.classList.toggle("is-empty", status.score === 0);
+  document.getElementById("summary-assets").textContent = formatCurrency(metrics.totalAssets);
+  document.getElementById("summary-liabilities").textContent = formatCurrency(metrics.totalLiabilities);
+  document.getElementById("summary-net-worth").textContent = formatCurrency(metrics.netWorth);
+  document.getElementById("summary-liquid-assets").textContent = formatCurrency(metrics.liquidAssets);
+  document.getElementById("summary-productive-assets").textContent = formatCurrency(metrics.productiveAssets);
+  document.getElementById("summary-consumer-debt").textContent = formatCurrency(metrics.consumerDebt);
+  document.getElementById("summary-caption").textContent = metrics.status.summary;
+  document.getElementById("health-score").textContent = `${metrics.status.score}/100`;
+  document.getElementById("health-label").textContent = metrics.status.label;
+  document.getElementById("health-copy").textContent = metrics.status.copy;
+  healthFill.style.width = `${metrics.status.score}%`;
+  healthFill.classList.toggle("is-empty", metrics.status.score === 0);
 
   if (healthCard) {
-    healthCard.style.setProperty("--health-accent", status.accent);
-    healthCard.style.setProperty("--health-accent-soft", status.accentSoft);
+    healthCard.style.setProperty("--health-accent", metrics.status.accent);
+    healthCard.style.setProperty("--health-accent-soft", metrics.status.accentSoft);
   }
 
   if (summaryBadge) {
-    summaryBadge.textContent = status.badge;
+    summaryBadge.textContent = metrics.status.badge;
   }
-
-  updateGoalCards(goals);
-  updateProjectionCard(goals);
-  updateHistoryCard({
-    snapshotDate: state.meta.snapshotDate,
-    netWorth,
-    totalAssets,
-    totalLiabilities,
-    liquidAssets,
-    debtRatio
-  });
-  renderBreakdown(totals, totalAssets, totalLiabilities);
-  renderBalanceComposition(totalAssets, totalLiabilities, liquidAssets);
-  renderDebtPriority();
 }
 
 function updateGoalCards(goals) {
@@ -3506,4 +3601,3 @@ function closeMobileNav() {
   mobileMenuToggle?.setAttribute("aria-expanded", "false");
   document.body.style.overflow = "";
 }
-

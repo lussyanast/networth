@@ -51,7 +51,7 @@
   <div class="mobile-nav-overlay" id="mobile-nav-overlay" aria-hidden="true"></div>
 
   <div class="page-shell">
-    <header class="hero">
+    <header class="hero" id="hero">
       <div class="hero-copy">
         <p class="eyebrow">Net Worth Tracker</p>
         <h1>Catat aset, hitung utang, lalu lihat posisi keuanganmu dalam satu layar.</h1>
@@ -98,9 +98,27 @@
       </div>
     </header>
 
-    <main class="workspace">
+    <main class="workspace" id="workspace" data-active-section="input">
+      <section class="workspace-section-bar" aria-labelledby="workspace-section-title">
+        <div class="workspace-section-copy">
+          <p class="section-kicker">Section Halaman</p>
+          <h2 id="workspace-section-title">Buka bagian yang kamu butuhkan saja</h2>
+          <p class="workspace-section-note">
+            Input, ringkasan, target, riwayat, dan tools dipisah supaya tampilan lebih ringan dan tidak numpuk.
+          </p>
+        </div>
+
+        <div class="workspace-section-pills" aria-label="Pilih section halaman">
+          <button class="workspace-section-pill is-active" type="button" data-workspace-section="input" aria-pressed="true">Input</button>
+          <button class="workspace-section-pill" type="button" data-workspace-section="overview" aria-pressed="false">Ringkasan</button>
+          <button class="workspace-section-pill" type="button" data-workspace-section="planning" aria-pressed="false">Target</button>
+          <button class="workspace-section-pill" type="button" data-workspace-section="history" aria-pressed="false">Riwayat</button>
+          <button class="workspace-section-pill" type="button" data-workspace-section="tools" aria-pressed="false">Tools</button>
+        </div>
+      </section>
+
       <section class="workspace-main">
-        <div class="section-intro">
+        <div class="section-intro" data-workspace-group="input">
           <div>
             <p class="section-kicker">Input Keuangan</p>
             <h2>Masukkan nilai yang kamu punya hari ini</h2>
@@ -110,7 +128,7 @@
           </p>
         </div>
 
-        <div class="flow-guide">
+        <div class="flow-guide" data-workspace-group="input">
           <article class="flow-step">
             <span class="flow-number">01</span>
             <div>
@@ -134,7 +152,7 @@
           </article>
         </div>
 
-        <section class="profile-panel" aria-labelledby="profile-panel-title">
+        <section class="profile-panel" id="profile-panel" aria-labelledby="profile-panel-title" data-workspace-group="input">
           <div class="profile-panel-head">
             <div>
               <p class="section-kicker">Template Profil</p>
@@ -192,7 +210,7 @@
           </div>
         </section>
 
-        <section class="planning-panel" aria-labelledby="planning-panel-title">
+        <section class="planning-panel" id="planning-panel" aria-labelledby="planning-panel-title" data-workspace-group="input">
           <div class="planning-panel-head">
             <div>
               <p class="section-kicker">Perencanaan</p>
@@ -278,7 +296,7 @@
           </div>
         </section>
 
-        <div class="categories-toolbar">
+        <div class="categories-toolbar" data-workspace-group="input">
           <label class="search-field" for="category-search">
             <span>Cari kategori atau instrumen</span>
             <input
@@ -324,7 +342,7 @@
           </p>
         </div>
 
-        <section class="category-nav" aria-labelledby="category-nav-title">
+        <section class="category-nav" aria-labelledby="category-nav-title" data-workspace-group="input">
           <div class="category-nav-head">
             <div>
               <p class="section-kicker">Navigasi Cepat</p>
@@ -340,7 +358,7 @@
           <div class="category-jump-list" id="category-jump-list" aria-live="polite"></div>
         </section>
 
-        <section class="privacy-panel" aria-labelledby="privacy-panel-title">
+        <section class="privacy-panel" id="data-tools" aria-labelledby="privacy-panel-title" data-workspace-group="tools" hidden>
           <div class="privacy-panel-copy">
             <p class="section-kicker">Privasi Lokal</p>
             <h3 id="privacy-panel-title">Data keuangan tetap di browser user</h3>
@@ -403,11 +421,11 @@
           </div>
         </section>
 
-        <div class="categories-grid" id="categories-grid"></div>
+        <div class="categories-grid" id="categories-grid" data-workspace-group="input"></div>
       </section>
 
       <aside class="workspace-side">
-        <section class="summary-card">
+        <section class="summary-card" data-workspace-group="input overview">
           <div class="summary-header">
             <p class="section-kicker">Ringkasan</p>
             <h2>Snapshot kekayaan bersih</h2>
@@ -477,7 +495,7 @@
           </div>
         </section>
 
-        <section class="summary-card target-card">
+        <section class="summary-card target-card" id="goal-net-worth" data-workspace-group="planning" hidden>
           <div class="summary-header">
             <p class="section-kicker">Target</p>
             <h2>Progress tujuan finansial</h2>
@@ -535,7 +553,7 @@
           </div>
         </section>
 
-        <section class="summary-card projection-card">
+        <section class="summary-card projection-card" data-workspace-group="planning" hidden>
           <div class="summary-header">
             <p class="section-kicker">Proyeksi</p>
             <h2>Simulasi menuju target</h2>
@@ -573,7 +591,7 @@
           <div class="projection-timeline" id="projection-timeline"></div>
         </section>
 
-        <section class="summary-card history-card">
+        <section class="summary-card history-card" id="history-section" data-workspace-group="history" hidden>
           <div class="summary-header">
             <p class="section-kicker">Riwayat</p>
             <h2>Bandingkan snapshot</h2>
@@ -600,7 +618,7 @@
           </p>
         </section>
 
-        <section class="summary-card">
+        <section class="summary-card" data-workspace-group="overview" hidden>
           <div class="summary-header">
             <p class="section-kicker">Breakdown</p>
             <h2>Total per kategori</h2>
@@ -609,7 +627,7 @@
           <div class="breakdown-list" id="breakdown-list"></div>
         </section>
 
-        <section class="summary-card composition-card">
+        <section class="summary-card composition-card" id="balance-composition" data-workspace-group="overview" hidden>
           <div class="summary-header">
             <p class="section-kicker">Komposisi</p>
             <h2>Neraca cepat</h2>
@@ -626,7 +644,7 @@
           </p>
         </section>
 
-        <section class="summary-card debt-priority-card">
+        <section class="summary-card debt-priority-card" id="debt-priority" data-workspace-group="overview" hidden>
           <div class="summary-header">
             <p class="section-kicker">Prioritas</p>
             <h2>Urutan utang yang perlu diperhatikan</h2>
@@ -642,7 +660,7 @@
           </p>
         </section>
 
-        <section class="summary-card tips-card">
+        <section class="summary-card tips-card" data-workspace-group="overview" hidden>
           <div class="summary-header">
             <p class="section-kicker">Catatan</p>
           </div>
