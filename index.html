@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="no-referrer">
+  <title>Net Worth Tracker</title>
+  <meta
+    name="description"
+    content="Kalkulator net worth sederhana untuk menghitung total aset, utang, dan kekayaan bersih secara realtime."
+  >
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+
+  <div class="page-shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Net Worth Tracker</p>
+        <h1>Catat aset, hitung utang, lalu lihat posisi keuanganmu dalam satu layar.</h1>
+        <p class="hero-text">
+          Semua total dihitung otomatis dan data tersimpan di browser kamu.
+        </p>
+
+        <div class="hero-actions">
+          <button class="button button-primary" id="fill-demo" type="button">Isi contoh</button>
+          <button class="button button-secondary" id="reset-all" type="button">Reset data</button>
+        </div>
+
+        <div class="hero-notes">
+          <span>Realtime total per kategori</span>
+          <span>Auto-save di browser</span>
+          <span>Data tetap di perangkat user</span>
+          <span>Responsif untuk HP & desktop</span>
+        </div>
+      </div>
+
+      <div class="hero-panel">
+        <div class="hero-panel-label">Posisi Saat Ini</div>
+        <div class="hero-panel-value" id="hero-net-worth">Rp0</div>
+        <div class="hero-panel-subtitle" id="hero-status">Mulai isi aset dan utangmu untuk melihat hasilnya.</div>
+
+        <div class="hero-panel-grid">
+          <article class="metric-chip">
+            <span>Total Aset</span>
+            <strong id="hero-assets">Rp0</strong>
+          </article>
+          <article class="metric-chip">
+            <span>Total Utang</span>
+            <strong id="hero-liabilities">Rp0</strong>
+          </article>
+          <article class="metric-chip">
+            <span>Rasio Utang</span>
+            <strong id="hero-debt-ratio">0%</strong>
+          </article>
+          <article class="metric-chip">
+            <span>Kategori Terbesar</span>
+            <strong id="hero-top-category">Belum ada</strong>
+          </article>
+        </div>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="workspace-main">
+        <div class="section-intro">
+          <div>
+            <p class="section-kicker">Input Keuangan</p>
+            <h2>Masukkan nilai yang kamu punya hari ini</h2>
+          </div>
+          <p class="section-copy">
+            Setiap kategori punya total otomatis. Kamu juga bisa tambah baris custom kalau ada aset atau utang yang tidak ada di daftar.
+          </p>
+        </div>
+
+        <div class="flow-guide">
+          <article class="flow-step">
+            <span class="flow-number">01</span>
+            <div>
+              <strong>Isi nilai aset</strong>
+              <p>Masukkan saldo, harga pasar, atau estimasi nilai jual asetmu saat ini.</p>
+            </div>
+          </article>
+          <article class="flow-step">
+            <span class="flow-number">02</span>
+            <div>
+              <strong>Catat semua utang</strong>
+              <p>Masukkan sisa kewajiban aktif supaya hasil net worth-nya lebih realistis.</p>
+            </div>
+          </article>
+          <article class="flow-step">
+            <span class="flow-number">03</span>
+            <div>
+              <strong>Lihat ringkasan</strong>
+              <p>Panel kanan langsung memperlihatkan total aset, utang, dan posisi bersihmu.</p>
+            </div>
+          </article>
+        </div>
+
+        <section class="profile-panel" aria-labelledby="profile-panel-title">
+          <div class="profile-panel-head">
+            <div>
+              <p class="section-kicker">Template Profil</p>
+              <h3 id="profile-panel-title">Pilih profil untuk mulai lebih cepat</h3>
+            </div>
+            <p class="profile-panel-copy">
+              Profil hanya mengatur fokus input dan checklist awal. Nilai aset serta utang yang sudah kamu isi tidak akan berubah.
+            </p>
+          </div>
+
+          <div class="profile-grid">
+            <button class="profile-card is-active" type="button" data-profile-template="general">
+              <span class="profile-card-tag">Umum</span>
+              <strong>Campuran pribadi + investasi</strong>
+              <p>Pakai kalau kondisi finansialmu tidak condong ke satu profil khusus.</p>
+            </button>
+
+            <button class="profile-card" type="button" data-profile-template="employee">
+              <span class="profile-card-tag">Karyawan</span>
+              <strong>Gaji rutin, utang pribadi, dan tabungan tujuan</strong>
+              <p>Cocok untuk user yang arus kas utamanya datang dari salary bulanan.</p>
+            </button>
+
+            <button class="profile-card" type="button" data-profile-template="freelancer">
+              <span class="profile-card-tag">Freelancer</span>
+              <strong>Pemasukan variatif dan buffer kas lebih penting</strong>
+              <p>Fokus ke kas, piutang masuk, dana darurat, dan kewajiban yang aktif.</p>
+            </button>
+
+            <button class="profile-card" type="button" data-profile-template="business_owner">
+              <span class="profile-card-tag">Owner Bisnis</span>
+              <strong>Kas usaha, piutang, stok, alat, dan utang operasional</strong>
+              <p>Cocok kalau aset dan kewajiban usaha perlu dilihat lebih jelas.</p>
+            </button>
+
+            <button class="profile-card" type="button" data-profile-template="investor">
+              <span class="profile-card-tag">Investor</span>
+              <strong>Portofolio, pertumbuhan aset, dan target jangka panjang</strong>
+              <p>Fokus ke investasi, pensiun, dan proyeksi net worth ke depan.</p>
+            </button>
+          </div>
+
+          <div class="profile-focus">
+            <div class="profile-focus-head">
+              <div>
+                <span class="profile-focus-label" id="profile-focus-label">Profil aktif: Umum</span>
+                <strong id="profile-focus-title">Cek semua area utama dulu</strong>
+              </div>
+              <span class="profile-focus-pill" id="profile-focus-preset">Mode Semua</span>
+            </div>
+            <p class="profile-focus-copy" id="profile-focus-copy">
+              Mulai dari cash, investasi, utang, lalu lengkapi aset besar seperti properti atau kendaraan bila memang ada.
+            </p>
+            <div class="profile-focus-points" id="profile-focus-points"></div>
+          </div>
+        </section>
+
+        <section class="planning-panel" aria-labelledby="planning-panel-title">
+          <div class="planning-panel-head">
+            <div>
+              <p class="section-kicker">Perencanaan</p>
+              <h3 id="planning-panel-title">Tambahkan konteks dan target sederhana</h3>
+            </div>
+            <p class="planning-panel-copy">
+              Tidak wajib, tapi membantu baca progres dengan lebih jelas.
+            </p>
+          </div>
+
+          <div class="planning-grid">
+            <label class="planning-field" for="snapshot-date">
+              <span>Tanggal snapshot</span>
+              <input id="snapshot-date" type="date">
+              <small>Tanggal acuan saat angka ini dicatat.</small>
+            </label>
+
+            <label class="planning-field" for="monthly-expense">
+              <span>Pengeluaran bulanan</span>
+              <input
+                id="monthly-expense"
+                type="text"
+                inputmode="numeric"
+                placeholder="Contoh 8000000"
+              >
+              <small>Dipakai untuk hitung target dana darurat.</small>
+            </label>
+
+            <label class="planning-field" for="emergency-months">
+              <span>Target dana darurat</span>
+              <input
+                id="emergency-months"
+                type="number"
+                min="1"
+                max="24"
+                step="1"
+                placeholder="6"
+              >
+              <small>Umumnya 3 sampai 12 bulan pengeluaran.</small>
+            </label>
+
+            <label class="planning-field" for="target-net-worth">
+              <span>Target net worth</span>
+              <input
+                id="target-net-worth"
+                type="text"
+                inputmode="numeric"
+                placeholder="Contoh 100000000"
+              >
+              <small>Target utama yang ingin kamu capai.</small>
+            </label>
+
+            <label class="planning-field" for="projection-monthly-add">
+              <span>Tambah bersih per bulan</span>
+              <input
+                id="projection-monthly-add"
+                type="text"
+                inputmode="numeric"
+                placeholder="Contoh 3000000"
+              >
+              <small>Simulasi tambahan aset bersih atau cicilan pokok yang rutin.</small>
+            </label>
+
+            <label class="planning-field" for="projection-annual-growth">
+              <span>Growth tahunan</span>
+              <input
+                id="projection-annual-growth"
+                type="number"
+                inputmode="decimal"
+                min="0"
+                max="50"
+                step="0.1"
+                placeholder="Contoh 5"
+              >
+              <small>Asumsi pertumbuhan bersih tahunan dalam persen.</small>
+            </label>
+          </div>
+
+          <div class="planning-footnote">
+            <span>Rumus dana darurat = pengeluaran bulanan x jumlah bulan target.</span>
+            <span>Progress dihitung otomatis dari aset likuid dan net worth saat ini.</span>
+            <span>Proyeksi target memakai net worth saat ini, tambahan bersih bulanan, dan growth tahunan.</span>
+          </div>
+        </section>
+
+        <div class="categories-toolbar">
+          <label class="search-field" for="category-search">
+            <span>Cari kategori atau instrumen</span>
+            <input
+              id="category-search"
+              type="search"
+              placeholder="Contoh: pensiun, saham, vendor, giro"
+            >
+          </label>
+
+          <div class="toolbar-side">
+            <div class="preset-group">
+              <span class="preset-label">Mode tampilan</span>
+              <div class="preset-pills" aria-label="Mode tampilan input">
+                <button class="preset-pill is-active" type="button" data-preset="all">Semua</button>
+                <button class="preset-pill" type="button" data-preset="personal">Pribadi</button>
+                <button class="preset-pill" type="button" data-preset="investment">Investasi</button>
+                <button class="preset-pill" type="button" data-preset="business">Bisnis</button>
+                <button class="preset-pill" type="button" data-preset="retirement">Pensiun</button>
+              </div>
+              <p class="preset-caption" id="preset-caption">Semua kategori input sedang ditampilkan.</p>
+            </div>
+
+            <div class="filter-pills" aria-label="Filter kategori">
+              <button class="filter-pill is-active" type="button" data-filter="all">Semua</button>
+              <button class="filter-pill" type="button" data-filter="asset">Aset</button>
+              <button class="filter-pill" type="button" data-filter="liability">Utang</button>
+            </div>
+
+            <div class="privacy-tools">
+              <button class="privacy-toggle" id="toggle-sensitive" type="button" aria-pressed="false">
+                Sembunyikan angka
+              </button>
+              <label class="private-session" for="private-session">
+                <input id="private-session" type="checkbox">
+                <span>Mode privat</span>
+              </label>
+            </div>
+          </div>
+
+          <p class="toolbar-caption" id="results-caption">Menampilkan semua kategori.</p>
+          <p class="privacy-caption">
+            Semua hitungan berjalan lokal di browser. Mode tampilan hanya mengatur panel input, sedangkan ringkasan kanan tetap menghitung seluruh data. Mode privat menyimpan data hanya sampai tab ini ditutup.
+          </p>
+        </div>
+
+        <section class="category-nav" aria-labelledby="category-nav-title">
+          <div class="category-nav-head">
+            <div>
+              <p class="section-kicker">Navigasi Cepat</p>
+              <h3 id="category-nav-title">Fokus ke bagian yang ingin kamu isi</h3>
+            </div>
+
+            <div class="category-nav-actions">
+              <button class="mini-button mini-button-secondary" id="expand-visible" type="button">Buka semua</button>
+              <button class="mini-button mini-button-secondary" id="collapse-visible" type="button">Rapikan tampilan</button>
+            </div>
+          </div>
+
+          <div class="category-jump-list" id="category-jump-list" aria-live="polite"></div>
+        </section>
+
+        <section class="privacy-panel" aria-labelledby="privacy-panel-title">
+          <div class="privacy-panel-copy">
+            <p class="section-kicker">Privasi Lokal</p>
+            <h3 id="privacy-panel-title">Data keuangan tetap di browser user</h3>
+            <p class="privacy-panel-text">
+              Aplikasi ini tidak mengirim nominal aset, utang, atau catatan ke server. Kalau dipakai di perangkat bersama,
+              aktifkan mode privat, backup ke file JSON lokal, lalu hapus data saat selesai.
+            </p>
+
+            <ul class="privacy-points">
+              <li>Tidak ada akun, login, atau sinkronisasi cloud.</li>
+              <li>Backup dan restore berjalan lewat file JSON lokal yang user pilih sendiri.</li>
+              <li>Tombol hapus data bisa dipakai untuk membersihkan browser setelah dipakai.</li>
+            </ul>
+          </div>
+
+          <div class="privacy-panel-actions">
+            <div class="privacy-status" aria-live="polite">
+              <span>Status penyimpanan</span>
+              <strong id="storage-mode-status">Tersimpan di browser ini</strong>
+              <small id="storage-mode-copy">
+                Data akan tetap ada saat halaman dibuka lagi di perangkat yang sama.
+              </small>
+            </div>
+
+            <div class="data-tool-grid">
+              <article class="data-tool-card">
+                <span class="data-tool-kicker">Backup Lokal</span>
+                <strong>Pilih format export</strong>
+                <p>Simpan backup sebagai JSON atau workbook Excel yang berisi ringkasan, detail terisi, aset, dan utang.</p>
+                <div class="data-tool-actions">
+                  <button class="button button-secondary" id="export-json" type="button">Export JSON</button>
+                  <button class="button button-secondary" id="export-excel" type="button">Export Excel</button>
+                </div>
+              </article>
+
+              <article class="data-tool-card">
+                <span class="data-tool-kicker">Restore</span>
+                <strong>Import dari file JSON</strong>
+                <p>Import hanya menerima backup JSON dan akan menampilkan preview sebelum data diganti.</p>
+                <div class="data-tool-actions">
+                  <button class="button button-secondary" id="import-data" type="button">Import JSON</button>
+                </div>
+              </article>
+
+              <article class="data-tool-card data-tool-card-danger">
+                <span class="data-tool-kicker">Privasi</span>
+                <strong>Bersihkan data perangkat</strong>
+                <p>Hapus semua data yang saat ini tersimpan di browser setelah selesai dipakai.</p>
+                <div class="data-tool-actions">
+                  <button class="button button-danger" id="wipe-data" type="button">Hapus semua data sekarang</button>
+                </div>
+              </article>
+            </div>
+
+            <input id="import-file" type="file" accept=".json,application/json" hidden>
+
+            <p class="privacy-disclaimer">
+              Backup hanya tersimpan jika user memilih menyimpan file hasil export. File itu tidak dikirim ke server dan import hanya membaca file JSON yang dipilih user.
+            </p>
+          </div>
+        </section>
+
+        <div class="categories-grid" id="categories-grid"></div>
+      </section>
+
+      <aside class="workspace-side">
+        <section class="summary-card">
+          <div class="summary-header">
+            <p class="section-kicker">Ringkasan</p>
+            <h2>Snapshot kekayaan bersih</h2>
+          </div>
+
+          <div class="summary-stat">
+            <div class="summary-stat-head">
+              <span>Net Worth</span>
+              <span class="summary-badge" id="summary-badge">Mulai isi data</span>
+            </div>
+            <strong id="summary-net-worth">Rp0</strong>
+            <small id="summary-caption">Belum ada data yang dihitung.</small>
+          </div>
+
+          <div class="formula-card">
+            <article class="formula-item">
+              <span>Total Aset</span>
+              <strong id="summary-assets">Rp0</strong>
+            </article>
+            <article class="formula-item formula-item-negative">
+              <span>Total Utang</span>
+              <strong id="summary-liabilities">Rp0</strong>
+            </article>
+          </div>
+
+          <div class="insight-grid">
+            <article class="insight-item">
+              <span>Aset likuid</span>
+              <strong id="summary-liquid-assets">Rp0</strong>
+            </article>
+            <article class="insight-item">
+              <span>Aset produktif</span>
+              <strong id="summary-productive-assets">Rp0</strong>
+            </article>
+            <article class="insight-item">
+              <span>Utang konsumtif</span>
+              <strong id="summary-consumer-debt">Rp0</strong>
+            </article>
+          </div>
+          <p class="insight-note">
+            Sub-metrik di atas hanya menghitung instrumen yang sudah terklasifikasi sistem.
+            Baris custom tetap masuk ke total aset dan total utang.
+          </p>
+
+          <div class="health-card" id="health-card">
+            <div class="health-card-top">
+              <div class="health-card-copy">
+                <span>Skor kesehatan</span>
+                <small>Gabungan net worth dan rasio utang saat ini.</small>
+              </div>
+              <div class="health-card-score">
+                <strong id="health-label">Mulai isi data</strong>
+                <span class="health-score-value" id="health-score">0/100</span>
+              </div>
+            </div>
+            <div class="health-meter">
+              <div class="health-meter-fill" id="health-fill"></div>
+            </div>
+            <div class="health-scale" aria-hidden="true">
+              <span>Rentan</span>
+              <span>Stabil</span>
+              <span>Kuat</span>
+            </div>
+            <p id="health-copy">
+              Setelah data masuk, kamu bisa lihat apakah posisi keuanganmu lebih kuat di aset atau masih berat di utang.
+            </p>
+          </div>
+        </section>
+
+        <section class="summary-card target-card">
+          <div class="summary-header">
+            <p class="section-kicker">Target</p>
+            <h2>Progress tujuan finansial</h2>
+          </div>
+
+          <div class="snapshot-row">
+            <div class="snapshot-row-copy">
+              <span>Tanggal snapshot</span>
+              <strong id="snapshot-date-label">Belum diatur</strong>
+            </div>
+            <small id="snapshot-date-caption">Pakai tanggal ini sebagai acuan saat membandingkan progress.</small>
+          </div>
+
+          <div class="goal-stack">
+            <article class="goal-item">
+              <div class="goal-item-head">
+                <div>
+                  <span>Target net worth</span>
+                  <strong id="goal-net-worth-status">Belum diatur</strong>
+                </div>
+                <span class="goal-progress-value" id="goal-net-worth-progress">0%</span>
+              </div>
+              <div class="goal-meter">
+                <div class="goal-meter-fill" id="goal-net-worth-fill"></div>
+              </div>
+              <div class="goal-item-stats">
+                <span>Saat ini <strong id="goal-net-worth-current">Rp0</strong></span>
+                <span>Target <strong id="goal-net-worth-target">Rp0</strong></span>
+              </div>
+              <p id="goal-net-worth-copy">
+                Tambahkan target net worth supaya progresnya bisa dipantau.
+              </p>
+            </article>
+
+            <article class="goal-item goal-item-emergency">
+              <div class="goal-item-head">
+                <div>
+                  <span>Dana darurat</span>
+                  <strong id="goal-emergency-status">Belum diatur</strong>
+                </div>
+                <span class="goal-progress-value" id="goal-emergency-progress">0%</span>
+              </div>
+              <div class="goal-meter">
+                <div class="goal-meter-fill" id="goal-emergency-fill"></div>
+              </div>
+              <div class="goal-item-stats">
+                <span>Aset likuid <strong id="goal-emergency-current">Rp0</strong></span>
+                <span>Target <strong id="goal-emergency-target">Rp0</strong></span>
+              </div>
+              <small class="goal-item-caption" id="goal-emergency-covered">Baru menutup 0 bulan kebutuhan.</small>
+              <p id="goal-emergency-copy">
+                Isi pengeluaran bulanan dan target bulan untuk melihat dana darurat ideal.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <section class="summary-card projection-card">
+          <div class="summary-header">
+            <p class="section-kicker">Proyeksi</p>
+            <h2>Simulasi menuju target</h2>
+          </div>
+
+          <div class="projection-hero">
+            <div class="projection-hero-copy">
+              <span>Estimasi capai target</span>
+              <strong id="projection-eta">Belum diatur</strong>
+              <p id="projection-caption">
+                Isi target net worth, tambahan bersih bulanan, atau growth tahunan untuk melihat simulasi.
+              </p>
+            </div>
+            <div class="projection-hero-side">
+              <span class="projection-badge" id="projection-status">Simulasi mati</span>
+              <small id="projection-gap">Belum ada target yang dihitung.</small>
+            </div>
+          </div>
+
+          <div class="projection-assumptions">
+            <article class="projection-chip">
+              <span>Tambah bersih / bulan</span>
+              <strong id="projection-monthly-add-value">Rp0</strong>
+            </article>
+            <article class="projection-chip">
+              <span>Growth / tahun</span>
+              <strong id="projection-growth-value">0%</strong>
+            </article>
+            <article class="projection-chip">
+              <span>Horizon</span>
+              <strong id="projection-horizon-value">10 tahun</strong>
+            </article>
+          </div>
+
+          <div class="projection-timeline" id="projection-timeline"></div>
+        </section>
+
+        <section class="summary-card history-card">
+          <div class="summary-header">
+            <p class="section-kicker">Riwayat</p>
+            <h2>Bandingkan snapshot</h2>
+          </div>
+
+          <div class="history-actions">
+            <button class="button button-secondary" id="save-history" type="button">Simpan snapshot saat ini</button>
+            <button class="mini-button mini-button-secondary" id="clear-history" type="button">Reset riwayat</button>
+          </div>
+
+          <div class="history-highlight">
+            <div class="history-highlight-head">
+              <span id="history-highlight-label">Belum ada riwayat</span>
+              <strong id="history-highlight-value">Rp0</strong>
+            </div>
+            <p id="history-highlight-copy">
+              Simpan snapshot pertama supaya kamu bisa melihat perubahan posisi dari waktu ke waktu.
+            </p>
+          </div>
+
+          <div class="history-list" id="history-list"></div>
+          <p class="history-note" id="history-note">
+            Riwayat ini hanya tersimpan lokal di browser dan ikut masuk ke backup.
+          </p>
+        </section>
+
+        <section class="summary-card">
+          <div class="summary-header">
+            <p class="section-kicker">Breakdown</p>
+            <h2>Total per kategori</h2>
+          </div>
+
+          <div class="breakdown-list" id="breakdown-list"></div>
+        </section>
+
+        <section class="summary-card composition-card">
+          <div class="summary-header">
+            <p class="section-kicker">Komposisi</p>
+            <h2>Neraca cepat</h2>
+          </div>
+
+          <div class="composition-card-copy">
+            Lihat seberapa besar posisi sekarang tersimpan di aset likuid, aset non-likuid, dan utang.
+          </div>
+
+          <div class="composition-bar" id="balance-composition-bar" aria-label="Komposisi neraca"></div>
+          <div class="composition-legend" id="balance-composition-legend"></div>
+          <p class="composition-note" id="balance-composition-note">
+            Komposisi akan muncul setelah ada aset atau utang yang diisi.
+          </p>
+        </section>
+
+        <section class="summary-card debt-priority-card">
+          <div class="summary-header">
+            <p class="section-kicker">Prioritas</p>
+            <h2>Urutan utang yang perlu diperhatikan</h2>
+          </div>
+
+          <p class="debt-priority-copy">
+            Ini heuristik sederhana. Umumnya utang berbiaya tinggi, berisiko cepat, atau mengganggu cashflow layak dicek lebih dulu.
+          </p>
+
+          <div class="debt-priority-list" id="debt-priority-list"></div>
+          <p class="debt-priority-note" id="debt-priority-note">
+            Saat belum ada utang aktif, daftar prioritas belum perlu ditampilkan.
+          </p>
+        </section>
+
+        <section class="summary-card tips-card">
+          <div class="summary-header">
+            <p class="section-kicker">Catatan</p>
+          </div>
+
+          <ul class="tips-list">
+            <li>Isi nominal pakai angka saja, misalnya <strong>25000000</strong>.</li>
+            <li>Template profil hanya membantu fokus input. Angka aset dan utangmu tidak diubah oleh pilihan profil.</li>
+            <li>Tanggal snapshot, target net worth, dan dana darurat bersifat opsional, tapi membantu membaca progres dengan lebih jernih.</li>
+            <li>Kolom catatan bisa dipakai untuk detail seperti tipe aset, jumlah gram emas, atau nama bank.</li>
+            <li>Data tersimpan otomatis di browser, jadi saat refresh halaman nilainya tetap ada.</li>
+            <li>Kartu komposisi dan prioritas utang di kanan hanya panduan awal, bukan pengganti keputusan finansial pribadi.</li>
+            <li>Proyeksi bukan jaminan hasil masa depan. Gunakan sebagai simulasi kasar, bukan angka pasti.</li>
+            <li>Simpan snapshot saat ada perubahan besar, misalnya setelah gajian, pelunasan utang, atau update nilai aset.</li>
+            <li>Yang sering lupa dihitung: giro, simpanan koperasi, RSU vested, stok usaha, DPLK, bonus tertagih, utang vendor, dan tagihan medis.</li>
+          </ul>
+        </section>
+      </aside>
+    </main>
+  </div>
+
+  <div class="import-preview-backdrop is-hidden" id="import-preview-backdrop" aria-hidden="true">
+    <section
+      class="import-preview-modal"
+      id="import-preview-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="import-preview-title"
+    >
+      <div class="import-preview-head">
+        <div>
+          <p class="section-kicker">Preview Import</p>
+          <h2 id="import-preview-title">Cek backup sebelum mengganti data</h2>
+        </div>
+        <button class="import-preview-close" id="import-preview-close" type="button" aria-label="Tutup preview import">
+          &times;
+        </button>
+      </div>
+
+      <p class="import-preview-copy">
+        Backup akan ditinjau dulu sebelum dipakai. Pastikan file, tanggal, total, dan perubahannya sesuai.
+      </p>
+
+      <div class="import-preview-grid">
+        <article class="import-preview-card import-preview-card-strong">
+          <span>Nama file</span>
+          <strong id="import-preview-file">-</strong>
+          <small id="import-preview-date">Tanggal export tidak tersedia.</small>
+        </article>
+
+        <article class="import-preview-card">
+          <span>Mode backup</span>
+          <strong id="import-preview-storage">-</strong>
+          <small id="import-preview-warning">Data saat ini akan diganti saat import dikonfirmasi.</small>
+        </article>
+      </div>
+
+      <div class="import-preview-metrics">
+        <article class="import-preview-metric">
+          <span>Total aset</span>
+          <strong id="import-preview-assets">Rp0</strong>
+        </article>
+        <article class="import-preview-metric">
+          <span>Total utang</span>
+          <strong id="import-preview-liabilities">Rp0</strong>
+        </article>
+        <article class="import-preview-metric">
+          <span>Net worth</span>
+          <strong id="import-preview-net-worth">Rp0</strong>
+        </article>
+      </div>
+
+      <div class="import-preview-metrics import-preview-metrics-compact">
+        <article class="import-preview-metric">
+          <span>Kategori terisi</span>
+          <strong id="import-preview-categories">0 kategori</strong>
+        </article>
+        <article class="import-preview-metric">
+          <span>Baris terisi</span>
+          <strong id="import-preview-rows">0 baris</strong>
+        </article>
+        <article class="import-preview-metric">
+          <span>Rasio utang</span>
+          <strong id="import-preview-ratio">0%</strong>
+        </article>
+      </div>
+
+      <div class="import-preview-list-wrap">
+        <div class="import-preview-list-head">
+          <span>Ringkasan kategori terisi</span>
+          <small>Kategori dengan nominal lebih dari nol.</small>
+        </div>
+        <div class="import-preview-list" id="import-preview-list"></div>
+      </div>
+
+      <div class="import-compare-wrap">
+        <div class="import-preview-list-head">
+          <span>Bandingkan dengan data saat ini</span>
+          <small>Lihat perubahan utama sebelum backup mengganti isi browser ini.</small>
+        </div>
+        <div class="import-compare-grid" id="import-compare-grid"></div>
+
+        <div class="import-compare-list-wrap">
+          <div class="import-preview-list-head">
+            <span>Kategori yang berubah</span>
+            <small>Diurutkan dari perubahan nominal terbesar.</small>
+          </div>
+          <div class="import-compare-list" id="import-compare-list"></div>
+        </div>
+      </div>
+
+      <div class="import-preview-actions">
+        <button class="button button-secondary" id="import-preview-cancel" type="button">Batal</button>
+        <button class="button button-primary" id="import-preview-confirm" type="button">Import sekarang</button>
+      </div>
+    </section>
+  </div>
+</body>
+</html>
